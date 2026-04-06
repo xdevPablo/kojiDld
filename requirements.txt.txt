@@ -1,0 +1,15 @@
+# --- UI Framework ---
+# Responsável pela interface gráfica e animações
+flet>=0.84.0
+
+# --- Extraction Engine ---
+# O motor que processa os links e faz a extração dos metadados
+yt-dlp>=2026.3.17
+
+# --- Multimedia & Processing ---
+# Wrapper para o FFmpeg, necessário para conversão de MP3 e fusão de MP4
+imageio-ffmpeg>=0.6.0
+
+# --- Build & Distribution ---
+# Necessário apenas para quem deseja compilar o código em um .exe novamente
+pyinstaller>=6.19.0

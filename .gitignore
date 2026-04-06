@@ -1,0 +1,37 @@
+# --- Ambientes Virtuais (Obrigatório) ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- Caches e Arquivos Temporários do Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.python-version
+
+# --- Pasta de Downloads (Dados do Usuário) ---
+# Evita que seus testes pessoais de download subam para o GitHub
+downloads/
+
+# --- Ferramentas Externas e Binários ---
+# O yt-dlp e o ffmpeg devem ser baixados via script/requirements, não via git
+ffmpeg.exe
+ffprobe.exe
+yt-dlp.exe
+
+# --- Arquivos de Build e Empacotamento (PyInstaller/Flet) ---
+build/
+dist/
+*.spec
+
+# --- Configurações de Editores (Opcional, mas recomendado) ---
+.vscode/
+.idea/
+*.swp
+*.bak
+
+# --- Arquivos do Sistema Operacional ---
+.DS_Store
+Thumbs.db
