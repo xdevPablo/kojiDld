@@ -17,9 +17,8 @@ import urllib.parse
 
 
 async def main(page: ft.Page):
-    # --- CORREÇÃO DO BUG PRINCIPAL: Captura o event loop do Flet ---
-    # page.update() chamado de threads externas não faz flush imediato.
-    # call_soon_threadsafe agenda o update dentro do loop correto do Flet.
+    # --- Captura o event loop do Flet ---
+    
     loop = asyncio.get_event_loop()
 
     def safe_update():
@@ -163,7 +162,6 @@ async def main(page: ft.Page):
     progress_wrapper          = _bar_wrapper(progress_bar)
     progress_infinite_wrapper = _bar_wrapper(progress_bar_infinite)
 
-    # Apenas um wrapper fica visível por vez
     progress_wrapper.visible          = True
     progress_infinite_wrapper.visible = False
 
@@ -198,8 +196,6 @@ async def main(page: ft.Page):
         progress_infinite_wrapper.visible = not numeric
 
     def show_error(msg):
-        # BUG CORRIGIDO: overlay.clear() antes de adicionar novo snackbar evita
-        # acúmulo de overlays fantasmas a cada erro, prevenindo vazamento de memória.
         page.overlay.clear()
         snack = ft.SnackBar(
             content=ft.Text(msg, color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD),
@@ -209,8 +205,6 @@ async def main(page: ft.Page):
         snack.open = True
         page.update()
 
-    # --- CALLBACKS CHAMADOS DE THREADS BACKGROUND ---
-    # Todos usam safe_update() para garantir flush imediato no WebSocket do Flet.
 
     def on_status(msg, is_error=False):
         status_text.value = msg
@@ -222,13 +216,10 @@ async def main(page: ft.Page):
             unlock_ui()
         else:
             status_text.color  = "#DC2626"
-            # BUG CORRIGIDO: reseta a cor da barra ao sair do estado de erro;
-            # sem isso ela ficaria vermelha em operações subsequentes normais.
             progress_bar.color = "#DC2626"
         safe_update()
 
     def on_progress(percent, eta, size_str, speed_str):
-        # Troca para barra numérica assim que o primeiro progresso chega
         if progress_infinite_wrapper.visible:
             _show_bar(numeric=True)
 
@@ -249,8 +240,6 @@ async def main(page: ft.Page):
         safe_update()
 
     def on_analysis(scan_data):
-        # BUG CORRIGIDO: limpa overlays antigos antes de abrir novo dialog,
-        # evitando acúmulo de dialogs fantasmas a cada scan consecutivo.
         page.overlay.clear()
 
         scan_content = ft.Column([
@@ -284,8 +273,6 @@ async def main(page: ft.Page):
         ], width=450, tight=True, spacing=0)
 
         def on_dismiss(e):
-            # BUG CORRIGIDO: on_dismiss chamava unlock_ui() mas nunca page.update(),
-            # deixando os controles visualmente bloqueados após fechar o dialog.
             unlock_ui()
             page.update()
 
@@ -317,7 +304,7 @@ async def main(page: ft.Page):
             tf.disabled = True
 
         dashboard_card.visible = True
-        _show_bar(numeric=False)    # começa com barra infinita
+        _show_bar(numeric=False)    
         percent_text.value = "..."
         details_text.value = "Fetching secure metadata and resolving links..."
         page.update()
@@ -330,7 +317,6 @@ async def main(page: ft.Page):
         quality_dropdown.disabled = False
         for tf in url_inputs:
             tf.disabled = False
-        # O caller chama safe_update() ou page.update() após unlock_ui().
 
     def is_valid_url(url):
         try:
@@ -366,7 +352,6 @@ async def main(page: ft.Page):
             return
 
         lock_ui()
-        # BUG CORRIGIDO: removido page.update() redundante — lock_ui() já chama.
         status_text.value = "Establishing secure connection to server..."
         page.update()
         core.start_analysis(first_url)
