@@ -12,7 +12,6 @@ __pycache__/
 .python-version
 
 # --- Pasta de Downloads (Dados do Usuário) ---
-# Evita que seus testes pessoais de download subam para o GitHub
 downloads/
 
 # --- Ferramentas Externas e Binários ---
